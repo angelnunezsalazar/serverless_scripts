@@ -33,5 +33,5 @@ module.exports = {
 let fileName=process.argv[2];
 if (fileName != null){
     let functions=extractFunctionsFromFile(fileName)
-    console.log(functions)
+    process.stdout.write(functions);
 }
