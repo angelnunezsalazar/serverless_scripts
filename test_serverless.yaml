@@ -1,0 +1,60 @@
+service: ${self:custom.region-name.${self:custom.stg_jvv}}MTO${self:custom.stg_jvv_upper}ADN
+
+custom: ${file(customConfig.yml)}
+
+provider:
+  name: aws
+  apiGateway:
+    restApiId: ${self:custom.api.${self:custom.stg_jvv}}
+    restApiRootResourceId: ${self:custom.api-resource.${self:custom.stg_jvv}} 
+  runtime : nodejs10.x
+  region: ${self:custom.region.${self:custom.stg_jvv}}
+  stage: ${opt:stage}
+  timeout: 30
+  memorySize: 512
+  versionFunctions: false
+  deploymentBucket:
+    name: ${self:custom.bucketDeploy.${self:custom.stg_jvv}}
+    serverSideEncryption: AES256
+  stackTags:
+    NAME: ${self:custom.serviceName.service}
+    ENTORNO: ${self:custom.environments.${self:custom.stg_jvv}}
+    PROYECTO: ${self:custom.project}
+    DOMINIO: ${self:custom.domain}
+    RESPONSABLE: ${self:custom.responsable}
+    ESTADO_OPERACION: ${self:custom.status}
+    MODULO: ${self:custom.module}
+  role: "${self:custom.role.${self:custom.stg_jvv}}"
+  vpc:
+    securityGroupIds:
+      - ${self:custom.security-group-id.${self:custom.stg_jvv}}
+    subnetIds:
+      - ${self:custom.sub-net-id_a.${self:custom.stg_jvv}}
+      - ${self:custom.sub-net-id_b.${self:custom.stg_jvv}}
+      # ${self:custom.sub-net-id_c.${self:custom.stg_jvv}}
+      - ${self:custom.sub-net-id_d.${self:custom.stg_jvv}}
+      #- ${self:custom.sub-net-id_e.${self:custom.stg_jvv}}
+      #- ${self:custom.sub-net-id_f.${self:custom.stg_jvv}}
+
+package:
+  individually: true
+  exclude:
+    - node_modules/**
+    - LMBJVVMTOADN/**
+    - LMBJVVMTOFAMILIA/**
+    - LMBJVVMETAGASTO/**
+    - LMBJVVMETAINGRESO/**
+    - LMBJVVMTOPENPADRE/**
+    - LMBJVVMTOHIPOTECARIO/**
+    - LMBJVVMTOSUMASEG/**
+    - ./**.json
+    - ./**.yml
+    - npm-cache/**
+    - ./**.sh
+    - Jenkinsfile
+
+  
+functions:
+  - ${file(LMBJVVMTOADN/lambda_definition.yml)} #LMBJVVMTOADN
+  - ${file(LMBJVVMTOFAMILIA/lambda_definition.yml)} #LMBJVVMTOFAMILIA
+  - ${file(LMBJVVMETAGASTO/lambda_definition.yml)} #LMBJVVMETAGASTO

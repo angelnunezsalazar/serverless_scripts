@@ -26,5 +26,12 @@ function extractWordByRegex(narration,regex) {
     return word;
 }
 
-let functions=extractFunctionsFromFile('./../serverless.yaml')
-console.log(functions)
+module.exports = {
+    extractFunctionsFromFile
+};
+
+let fileName=process.argv[2];
+if (fileName != null){
+    let functions=extractFunctionsFromFile(fileName)
+    console.log(functions)
+}
