@@ -1,0 +1,50 @@
+getWatchList:
+  handler: LMBJVVWATCHLIST/src/controllers/WatchlistController.consultarWatchlistController
+  name: "${self:custom.nom_lambda}OBTWATCHLIST"
+  description: Retorna si el cliente esta dentro del watchlist
+  layers:
+    - ${self:custom.layer.${self:custom.stg_jvv}}
+    - ${self:custom.layerjvv.${self:custom.stg_jvv}}
+  package:
+    include:
+    - LMBJVVWATCHLIST/src/**
+  environment:       
+    API_TOKEN_WHATCH_LIST: "${self:custom.watch_list.api_token.${self:custom.stg_jvv}}"
+    API_SERVICE_WHATCH_LIST: "${self:custom.watch_list.api_watchlist.${self:custom.stg_jvv}}"
+    API_TOKEN_USER: "${self:custom.watch_list.api_token_user.${self:custom.stg_jvv}}"
+    API_TOKEN_PASSWORD: "${self:custom.watch_list.api_token_password.${self:custom.stg_jvv}}"
+    PC_CLOUD_HOST: "${self:custom.db_host.${self:custom.stg_jvv}}"
+    PC_CLOUD_DATABASE: "${self:custom.db_name.${self:custom.stg_jvv}}"
+    PC_CLOUD_USER: "${self:custom.db_username.${self:custom.stg_jvv}}"
+    PC_CLOUD_PASSWORD: "${self:custom.db_password.${self:custom.stg_jvv}}"
+    PC_CLOUD_PORT: "${self:custom.db_port}"
+    LAMBDA_WATCHLIST_USER: "JOURNEY_VENTA_VIDA"
+    SQS_CLOUD_TRACE: "${self:custom.sqs_trace.${self:custom.stg_jvv}}"    
+  events:
+    - http:
+        path: cliente/watchlist
+        method: post
+        produces:
+           - "application/json"
+        authorizer:
+         type: "${self:custom.type_auth.${self:custom.stg_jvv}}"
+        responses:
+           200:
+             description: "200 response"
+             schema:
+               $ref: "#/definitions/Empty"
+             headers:
+               Access-Control-Allow-Origin:
+                type: "string"
+        cors:
+           origin: '*'
+           headers:
+               - Content-Type
+               - X-Amz-Date
+               - Authorization
+               - X-Api-Key
+               - X-Amz-Security-Token
+               - X-Amz-User-Agent
+               - Access-Control-Allow-Origin
+               - Access-Control-Allow-Credentials
+               - User

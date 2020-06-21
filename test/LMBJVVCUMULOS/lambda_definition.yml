@@ -1,0 +1,57 @@
+getCumulus:
+  handler: LMBJVVCUMULOS/src/controllers/ProductController.getCumulus
+  name: "${self:custom.nom_lambda}CUMULO001"
+  description: Obtiene cúmulos de los cores AE, ...
+  layers:
+    - ${self:custom.layer.${self:custom.stg_jvv}}
+    - ${self:custom.layerjvv.${self:custom.stg_jvv}}
+  package:
+    include:
+    - LMBJVVCUMULOS/src/**
+    - node_modules/moment/**
+    - node_modules/underscore/**
+  environment:
+    SSM_PARAMETER_PATH_INIT: "${self:custom.ssm_path_init.${self:custom.stg_jvv}}"
+    # Acsel/E
+    ACSELE_ONPREMISE_CONNECTION_STRING: "${self:custom.acsele.acsele_onpremise_connection_string.${self:custom.stg_jvv}}"
+    ACSELE_ONPREMISE_USER: "${self:custom.acsele.acsele_onpremise_user.${self:custom.stg_jvv}}"
+    ACSELE_ONPREMISE_PASSWORD: "${self:custom.acsele.acsele_onpremise_password.${self:custom.stg_jvv}}"
+    ACSELE_ONPREMISE_DATABASE: "${self:custom.acsele.acsele_onpremise_database.${self:custom.stg_jvv}}"
+    # VUL
+    VUL_ONPREMISE_CONNECTION_STRING: "${self:custom.vul.vul_onpremise_connection_string.${self:custom.stg_jvv}}"
+    VUL_ONPREMISE_USER: "${self:custom.vul.vul_onpremise_user.${self:custom.stg_jvv}}"
+    VUL_ONPREMISE_PASSWORD: "${self:custom.vul.vul_onpremise_password.${self:custom.stg_jvv}}"
+    VUL_ONPREMISE_DATABASE: "${self:custom.vul.vul_onpremise_database.${self:custom.stg_jvv}}"
+    # AS400
+    AS400_ONPREMISE_CONNECTION_STRING: "${self:custom.as400.as400_onpremise_connection_string.${self:custom.stg_jvv}}"
+    AS400_ONPREMISE_USER: "${self:custom.as400.as400_onpremise_user.${self:custom.stg_jvv}}"
+    AS400_ONPREMISE_PASSWORD: "${self:custom.as400.as400_onpremise_password.${self:custom.stg_jvv}}"
+    SQS_CLOUD_TRACE: "${self:custom.sqs_trace.${self:custom.stg_jvv}}"  
+  events:
+    - http:
+        path: cliente/obtenerproductos
+        method: post
+        produces:
+           - "application/json"
+        authorizer:
+         type: "${self:custom.type_auth.${self:custom.stg_jvv}}"
+        responses:
+           200:
+             description: "200 response"
+             schema:
+               $ref: "#/definitions/Empty"
+             headers:
+               Access-Control-Allow-Origin:
+                type: "string"
+        cors:
+           origin: '*'
+           headers:
+               - Content-Type
+               - X-Amz-Date
+               - Authorization
+               - X-Api-Key
+               - X-Amz-Security-Token
+               - X-Amz-User-Agent
+               - Access-Control-Allow-Origin
+               - Access-Control-Allow-Credentials
+               - User

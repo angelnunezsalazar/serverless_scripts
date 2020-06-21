@@ -1,0 +1,48 @@
+getObtCliente:
+  handler: LMBJVVOBTCLIENTE/src/controllers/ObtClienteController.consultaObtClienteController
+  name: "${self:custom.nom_lambda}OBTCLIENTE0002"
+  description: Retorna un tercero si existe en el SAS y Journey
+  layers:
+    - ${self:custom.layer.${self:custom.stg_jvv}}
+    - ${self:custom.layerjvv.${self:custom.stg_jvv}}
+  package:
+    include:
+    - LMBJVVOBTCLIENTE/src/** 
+  environment:       
+    EP_BSQCLIENTE: "${self:custom.terceros.ep_bsqtercero.${self:custom.stg_jvv}}"
+    BSQCLIENTE_CT: "${self:custom.terceros.bsqterceroct.${self:custom.stg_jvv}}"
+    PC_CLOUD_HOST: "${self:custom.db_host.${self:custom.stg_jvv}}"
+    PC_CLOUD_DATABASE: "${self:custom.db_name.${self:custom.stg_jvv}}"
+    PC_CLOUD_USER: "${self:custom.db_username.${self:custom.stg_jvv}}"
+    PC_CLOUD_PASSWORD: "${self:custom.db_password.${self:custom.stg_jvv}}"
+    PC_CLOUD_PORT: "${self:custom.db_port}"
+    SQS_CLOUD_TRACE: "${self:custom.sqs_trace.${self:custom.stg_jvv}}"
+  events:
+    - http:
+        path: cliente/obtener
+        method: post
+        produces:
+           - "application/json"
+        authorizer:
+          type: "${self:custom.type_auth.${self:custom.stg_jvv}}"
+        responses:
+           200:
+             description: "200 response"
+             schema:
+               $ref: "#/definitions/Empty"
+             headers:
+               Access-Control-Allow-Origin:
+                 type: "string" 
+
+        cors:
+           origin: '*'
+           headers:
+               - Content-Type
+               - X-Amz-Date
+               - Authorization
+               - X-Api-Key
+               - X-Amz-Security-Token
+               - X-Amz-User-Agent
+               - Access-Control-Allow-Origin
+               - Access-Control-Allow-Credentials
+               - User
