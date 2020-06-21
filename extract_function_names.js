@@ -4,15 +4,25 @@ const fs = require('fs')
 const YAML = require(`${root}/yaml`);
 const regex = new RegExp(".*file\\((.+)/lambda_definition.yml\\)}", "i");
 
-function extractFunctionsFromFile(fileName){
-    const content = fs.readFileSync(fileName, 'utf8')
-    let serverless=YAML.parse(content)
+function extractFunctionNameFromConfig(serverlessConfig){
     let functions=''
     let delim=''
-    serverless.functions.forEach(f => {
+    let directories=extractLambdaDirectoriesFromConfig(serverlessConfig)
+    directories.forEach(dir => {
+        functionName=extractFunctionNameFromLambdaDirectory(dir);
+        functions=functions+delim+functionName
+        delim=','          
+    });
+    return functions
+}
+
+function extractLambdaDirectoriesFromConfig(fileName){
+    const content = fs.readFileSync(fileName, 'utf8')
+    let serverlessConfig=YAML.parse(content)
+    let functions=[]
+    serverlessConfig.functions.forEach(f => {
         word=extractWordByRegex(f, regex);
-        functions=functions+delim+word
-        delim=','
+        functions.push(word)
     });
     return functions;
 }
@@ -26,12 +36,21 @@ function extractWordByRegex(narration,regex) {
     return word;
 }
 
+function extractFunctionNameFromLambdaDirectory(dirName){
+    const content = fs.readFileSync(`${dirName}/lambda_definition.yml`, 'utf8')
+    let lambdaDefinition=YAML.parse(content)
+    let functionName=Object.keys(lambdaDefinition)[0]
+    return functionName
+}
+
 module.exports = {
-    extractFunctionsFromFile
+    extractFunctionNameFromConfig,
+    extractLambdaDirectoriesFromConfig,
+    extractFunctionNameFromLambdaDirectory,
 };
 
-let fileName=process.argv[2];
-if (fileName != null){
-    let functions=extractFunctionsFromFile(fileName)
+let serverlessConfig=process.argv[2];
+if (serverlessConfig != null){
+    let functions=extractFunctionNameFromConfig(serverlessConfig)
     process.stdout.write(functions);
 }
